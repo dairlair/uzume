@@ -2,12 +2,40 @@ package main
 
 import (
 	"fmt"
+	"github.com/dairlair/uzume/internal/cue"
 	"github.com/dhowden/tag"
 	"os"
 	"path/filepath"
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: cueparser <cuefile.cue>")
+		return
+	}
+
+	cueSheet, err := cue.ParseCueFile(os.Args[1])
+	if err != nil {
+		fmt.Printf("Error parsing CUE file: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Album: %s\n", cueSheet.Title)
+	fmt.Printf("Performer: %s\n", cueSheet.Performer)
+	fmt.Printf("Audio File: %s (%s)\n", cueSheet.FileName, cueSheet.FileType)
+	fmt.Println("\nTracks:")
+	for _, track := range cueSheet.Tracks {
+		fmt.Printf("%02d. %s - %s (starts at %s, offset %d samples)\n",
+			track.Number,
+			track.Performer,
+			track.Title,
+			track.StartTime,
+			track.FileOffset,
+		)
+	}
+}
+
+func mainShowTags() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: uzume <directory>")
 		os.Exit(1)
